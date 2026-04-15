@@ -1,0 +1,17 @@
+# Exclude data folders and models from being sent into the initial Docker build scope
+# (We only need the finalized keras model, but data/ is too large).
+data/
+ecg/
+Palm/
+*.zip
+*.csv
+
+# Python environment
+venv/
+env/
+__pycache__/
+*.pyc
+
+# Local git and archive
+.git
+archive/

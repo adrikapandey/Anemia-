@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnemiaSense AI | Palm Diagnostic</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <!-- Background Orbs for aesthetic Depth -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <main class="container">
+        
+        <header class="app-header">
+            <h1 class="logo-title">Anemia<span class="highlight">Sense</span></h1>
+            <p class="subtitle">AI-Powered Rapid Diagnostic Tool via Palm Analysis</p>
+        </header>
+
+        <section class="glass-panel">
+            <div id="drop-area" class="drop-area">
+                <input type="file" id="fileElem" accept="image/png, image/jpeg, image/jpg" hidden>
+                <div class="drag-contents">
+                    <div class="icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                    </div>
+                    <h3>Drag & Drop Palm Image Here</h3>
+                    <p>or</p>
+                    <label class="button-primary" for="fileElem">Browse Files</label>
+                </div>
+            </div>
+
+            <!-- Loading Interface -->
+            <div id="loading-state" class="hidden">
+                <div class="spinner"></div>
+                <p>Running Neural Network Interface...</p>
+            </div>
+
+            <!-- Results Interface -->
+            <div id="result-state" class="hidden">
+                <h2 class="result-title">Analysis <span class="highlight">Complete</span></h2>
+                <div class="result-card">
+                    <p class="diagnosis-label">Diagnosis</p>
+                    <h3 id="diagnosis-text" class="diagnosis-text">Anemic</h3>
+                </div>
+                
+                <div class="confidence-bar">
+                    <div class="confidence-fill" id="confidence-fill"></div>
+                </div>
+                <p class="confidence-text">Probability score: <span id="probability-text">98%</span></p>
+
+                <button class="button-secondary" onclick="resetApp()">Scan Another Image</button>
+            </div>
+
+        </section>
+
+        <footer class="footer">
+            <p><strong>Disclaimer:</strong> This tool utilizes deep learning to assist with detection but is intended for educational purposes only. It does not replace professional medical diagnosis.</p>
+        </footer>
+    </main>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
