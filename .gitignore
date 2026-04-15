@@ -1,0 +1,26 @@
+# Dataset files and directories
+data/
+ecg/
+Palm/
+*.csv
+*.zip
+
+# Python and Jupyter
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.ipynb_checkpoints/
+.pytest_cache/
+
+# Virtual environments
+venv/
+env/
+ENV/
+.env
+
+# Trained models
+*.h5
+*.keras
+*.hdf5
+*.pkl
