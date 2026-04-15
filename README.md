@@ -1,3 +1,12 @@
+---
+title: AnemiaSense
+emoji: 🩸
+colorFrom: purple
+colorTo: blue
+sdk: docker
+pinned: false
+---
+
 # Anemia Detection from Palm and ECG Data 🩸🖐🏻
 
 This project aims to detect anemia utilizing image-based datasets (like palm images) applying Convolutional Neural Networks (CNN). The repository is currently extending its scope to also ingest ECG data to perform comprehensive anemia classification.
