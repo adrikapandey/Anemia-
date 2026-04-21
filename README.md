@@ -18,6 +18,23 @@ This project aims to detect anemia utilizing image-based datasets (like palm ima
 - **Custom CNN Architecture**: Built natively using TensorFlow and Keras. Includes robust normalization, downsampling, and regularization techniques (Dropout) to prevent overfitting during training. 
 - **Image Augmentation**: Real-time data augmentation (rotations, zooms, flips, shifts) via Keras `ImageDataGenerator` to improve model generalization over small datasets.
 - **Callbacks Strategy**: Incorporates `EarlyStopping` preventing wasteful epoch runs and `ReduceLROnPlateau` enabling delicate loss tracking convergence.
+- **Distributed Caching Layer**: Utilizes Redis to aggressively intercept redundant MD5 hash signatures, dramatically bypassing heavy inference calculations and dropping latency to robust O(1) response times.
+
+## System Architecture
+
+```mermaid
+graph TD
+    A[Client UI / Browser] -->|Drag & Drop Palm Image| B(Flask API Endpoint)
+    B -->|Generates MD5 Hash| C{Redis Cache}
+    
+    C -->|🎉 Cache Hit| D[Serve Cached Diagnosis]
+    D -->|O'1' Latency| A
+    
+    C -->|⚠️ Cache Miss| E[Deep Learning Pipeline]
+    E --> F((TensorFlow / Keras CNN))
+    F -->|Output Prediction| G[Save Result to Redis]
+    G --> A
+```
 
 ## Project Structure
 ```text
