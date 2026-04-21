@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 resetApp();
                 return;
             }
-            displayResult(data.prediction, data.probability);
+            displayResult(data.prediction, data.probability, data.cached);
         })
         .catch(error => {
             console.error('Error:', error);
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function displayResult(prediction, probabilityRaw) {
+    function displayResult(prediction, probabilityRaw, isCached) {
         // Hide loading, show result
         loadingState.classList.add('hidden');
         resultState.classList.remove('hidden');
@@ -101,12 +101,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // Reset previous color classes
         diagnosisText.classList.remove('text-anemic', 'text-non-anemic');
 
+        let cacheBadge = isCached ? " ⚡️ (Cache Hit)" : "";
+
         if (prediction === 'Anemic') {
-            diagnosisText.textContent = 'Anemic';
+            diagnosisText.textContent = 'Anemic' + cacheBadge;
             diagnosisText.classList.add('text-anemic');
             confidenceFill.style.background = 'var(--accent-red)';
         } else {
-            diagnosisText.textContent = 'Non-Anemic';
+            diagnosisText.textContent = 'Non-Anemic' + cacheBadge;
             diagnosisText.classList.add('text-non-anemic');
             confidenceFill.style.background = '#06d6a0'; // Success green
         }

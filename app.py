@@ -1,4 +1,7 @@
 import os
+import hashlib
+import json
+import redis
 from flask import Flask, render_template, request, jsonify
 from werkzeug.utils import secure_filename
 from src.inference import load_anemia_model, predict_image
@@ -22,6 +25,21 @@ def allowed_file(filename):
 # Load the AI model on server startup
 load_anemia_model()
 
+# Initialize external Redis Cache (Distributed Component)
+redis_url = os.environ.get("REDIS_URL", None)
+redis_client = None
+
+if redis_url:
+    try:
+        redis_client = redis.from_url(redis_url)
+        redis_client.ping()
+        print("✅ Distributed Cache initialized: Connected to Redis successfully.")
+    except Exception as e:
+        print(f"⚠️  Warning: Failed to connect to Redis. Running without cache. Error: {e}")
+        redis_client = None
+else:
+    print("ℹ️  No REDIS_URL environment variable found. Cache layer disabled by default.")
+
 @app.route('/')
 def index():
     """Renders the main frontend web page."""
@@ -42,19 +60,39 @@ def predict():
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         
         try:
-            # Save the file locally
+            # 1. Read bytes and Hash (Latency Cache Intercept)
+            file_bytes = file.read()
+            file_hash = hashlib.md5(file_bytes).hexdigest()
+            file.seek(0) # Reset pointer so file.save() works properly
+
+            # 2. Query Distributed Cache
+            if redis_client:
+                cached_result = redis_client.get(file_hash)
+                if cached_result:
+                    print(f"⚡️ CACHE HIT! Bypassing inference model for hash: {file_hash}")
+                    data = json.loads(cached_result)
+                    return jsonify({
+                        'prediction': data['prediction'],
+                        'probability': round(data['probability'] * 100, 2),
+                        'cached': True
+                    })
+
+            # 3. Cache Miss: Normal Inference Flow
             file.save(filepath)
-            
-            # Predict using our inference module
             predicted_class, probability = predict_image(filepath)
             
-            # Clean up the file after prediction
             if os.path.exists(filepath):
                 os.remove(filepath)
                 
+            # 4. Save to Cache
+            if redis_client:
+                r_payload = json.dumps({'prediction': predicted_class, 'probability': probability})
+                redis_client.setex(file_hash, 86400, r_payload) # Cache for 24 hours
+
             return jsonify({
                 'prediction': predicted_class,
-                'probability': round(probability * 100, 2)
+                'probability': round(probability * 100, 2),
+                'cached': False
             })
             
         except Exception as e:
